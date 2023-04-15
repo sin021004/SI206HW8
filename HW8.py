@@ -62,7 +62,7 @@ def find_rest_in_building(building_num, db):
     pass
 
 #EXTRA CREDIT
-def get_highest_rating(db): #Do this through DB as well
+def get_highest_rating(db):
     """
     This function return a list of two tuples. The first tuple contains the highest-rated restaurant category 
     and the average rating of the restaurants in that category, and the second tuple contains the building number 
@@ -73,7 +73,49 @@ def get_highest_rating(db): #Do this through DB as well
     The second bar chart displays the buildings along the y-axis and their ratings along the x-axis 
     in descending order (by rating).
     """
-    pass
+    conn = sqlite3.connect(db)
+    c = conn.cursor()
+
+    # Get the highest-rated restaurant category and its average rating
+    c.execute("SELECT category, AVG(rating) as avg_rating FROM restaurants GROUP BY category ORDER BY avg_rating DESC LIMIT 1")
+    category_data = c.fetchone()
+
+    # Get the highest-rated building and its average rating
+    c.execute("SELECT building, AVG(rating) as avg_rating FROM restaurants GROUP BY building ORDER BY avg_rating DESC LIMIT 1")
+    building_data = c.fetchone()
+
+    # Create bar chart for restaurant categories
+    c.execute("SELECT category, AVG(rating) as avg_rating FROM restaurants GROUP BY category ORDER BY avg_rating DESC")
+    category_rows = c.fetchall()
+    categories = [row[0] for row in category_rows]
+    avg_ratings = [row[1] for row in category_rows]
+
+    fig, axs = plt.subplots(nrows=1, ncols=2, figsize=(10, 5))
+    axs[0].barh(categories, avg_ratings)
+    axs[0].set_title('Average ratings by restaurant category')
+    axs[0].set_xlabel('Average rating')
+    axs[0].set_ylabel('Restaurant category')
+    axs[0].invert_yaxis()
+
+    # Create bar chart for buildings
+    c.execute("SELECT building, AVG(rating) as avg_rating FROM restaurants GROUP BY building ORDER BY avg_rating DESC")
+    building_rows = c.fetchall()
+    buildings = [row[0] for row in building_rows]
+    avg_ratings = [row[1] for row in building_rows]
+
+    axs[1].barh(buildings, avg_ratings)
+    axs[1].set_title('Average ratings by building')
+    axs[1].set_xlabel('Average rating')
+    axs[1].set_ylabel('Building')
+    axs[1].invert_yaxis()
+
+    plt.tight_layout()
+    plt.show()
+
+    conn.close()
+
+    return [(category_data[0], category_data[1]), (building_data[0], building_data[1])]
+
 
 #Try calling your functions here
 def main():
