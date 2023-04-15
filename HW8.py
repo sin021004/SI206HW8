@@ -26,11 +26,9 @@ def load_rest_data(db):
         building = row[2]
         rating = row[3]
         if rest_name not in rest_data:
-            rest_data[rest_name] = {}
-        rest_data[rest_name]["category"] = category
-        rest_data[rest_name]["building"] = building
-        rest_data[rest_name]["rating"] = rating
+            rest_data[rest_name] = {"category": category, "building": building, "rating": rating}
     return rest_data
+
 
 def plot_rest_categories(db):
     """
